@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>For My Beautiful Maria 💖</title>
+
+<style>
+    * { 
+        margin: 0; padding: 0; box-sizing: border-box; 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+        -webkit-tap-highlight-color: transparent; 
+    }
+
+    body {
+        height: 100vh;
+        background: #4a0000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        perspective: 1500px;
+        touch-action: manipulation;
+    }
+
+    .background-container {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle, #8b0000 0%, #4a0000 100%);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 0;
+    }
+
+    .content-wrapper {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%; height: 100%;
+        transform-style: preserve-3d;
+    }
+
+    .screen {
+        position: absolute;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+    .active { display: flex; opacity: 1; }
+
+    /* --- ENVELOPE --- */
+    .envelope-wrapper {
+        position: relative;
+        cursor: pointer;
+        animation: breathe 4s ease-in-out infinite;
+        transform-style: preserve-3d;
+        width: 500px;
+        max-width: 90vw;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+    }
+
+    @keyframes breathe {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+
+    .envelope {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        background: #fdfdfd; 
+        border-radius: 5px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.1);
+        border: 1px solid #ddd;
+        transform-style: preserve-3d;
+        transition: transform 0.8s ease;
+    }
+
+    .letter {
+        position: absolute;
+        bottom: 10px; 
+        left: 5%;
+        width: 90%; height: 85%;
+        background: white;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ctext x='5' y='20' font-size='14' opacity='0.4'%3E💋%3C/text%3E%3Ctext x='35' y='50' font-size='12' opacity='0.3'%3E💋%3C/text%3E%3C/svg%3E");
+        border: 1px solid #eee;
+        z-index: 2; 
+        transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.6s, z-index 0s linear 1s;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: #ff4d6d;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        font-weight: 800;
+    }
+
+    .envelope.open .letter { transform: translateY(-190px) rotate(-2deg); z-index: 6; }
+
+    .flap-top {
+        position: absolute;
+        top: 0; width: 0; height: 0;
+        border-left: 250px solid transparent;
+        border-right: 250px solid transparent;
+        border-top: 200px solid #ff6b81; 
+        transform-origin: top;
+        transition: transform 0.5s ease-in-out, z-index 0.2s 0.4s;
+        z-index: 5;
+    }
+
+    .flap-left { position: absolute; left: 0; bottom: 0; border-left: 260px solid #ff8e9e; border-top: 175px solid transparent; border-bottom: 175px solid transparent; z-index: 4; }
+    .flap-right { position: absolute; right: 0; bottom: 0; border-right: 260px solid #ff8e9e; border-top: 175px solid transparent; border-bottom: 175px solid transparent; z-index: 4; }
+    .flap-bottom { position: absolute; bottom: 0; border-left: 250px solid transparent; border-right: 250px solid transparent; border-bottom: 185px solid #ff7a8f; z-index: 3; }
+
+    .envelope.open .flap-top { transform: rotateX(180deg); z-index: 1; }
+
+    .seal {
+        position: absolute;
+        top: 175px; left: 50%; width: 80px; height: 80px;
+        background: #d63351; border-radius: 50%; transform: translate(-50%, -50%);
+        z-index: 6; display: flex; justify-content: center; align-items: center;
+        color: white; font-size: 35px; transition: 0.3s;
+    }
+
+    .envelope.open .seal { opacity: 0; transform: translate(-50%, -50%) scale(0); pointer-events: none; }
+
+    /* --- COMPONENTS --- */
+    .teddy-box { font-size: 80px; position: relative; margin-bottom: 10px; }
+    .rose { position: absolute; bottom: 10px; right: -10px; font-size: 40px; transition: 0.8s; opacity: 0; transform: scale(0); }
+    .rose-appear { opacity: 1; transform: scale(1.1) rotate(15deg) translateY(-15px); }
+    
+    .bubble {
+        position: absolute;
+        top: -40px;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-size: 16px;
+        color: #333;
+        font-weight: bold;
+        opacity: 0;
+        transform: scale(0);
+        transition: 0.5s 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        white-space: nowrap;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -10px; left: 50%;
+        border-left: 10px solid transparent; border-right: 10px solid transparent;
+        border-top: 10px solid white; transform: translateX(-50%);
+    }
+    .active .bubble { opacity: 1; transform: scale(1); }
+
+    h1 { color: white; text-shadow: 2px 2px #b30000; margin-bottom: 20px; text-align: center; font-size: 24px; font-weight: 700;}
+    
+    button { 
+        padding: 12px 30px; border: none; border-radius: 30px; 
+        background: #d63351; color: white; cursor: pointer; 
+        font-size: 18px; font-weight: bold;
+        box-shadow: 0 6px 0 #b30000; transition: 0.1s; outline: none;
+    }
+    button:active { transform: translateY(3px); box-shadow: 0 3px 0 #b30000; }
+
+    #noBtn { background: #a0a0a0; box-shadow: 0 6px 0 #707070; transition: transform 0.2s; will-change: transform; z-index: 100; }
+    
+    /* SHATTER PIECES */
+    .shatter-piece {
+        position: fixed;
+        width: 15px;
+        height: 15px;
+        background: #a0a0a0;
+        pointer-events: none;
+        z-index: 1000;
+        transition: transform 1s cubic-bezier(0.2, 0.5, 0.4, 1), opacity 1s;
+    }
+
+    /* GENTLE SHAKE */
+    .excited-shake { animation: shake 0.6s ease-in-out infinite; }
+    @keyframes shake {
+        0%, 100% { transform: translate(0,0); }
+        25% { transform: translate(2px, 2px) rotate(0.5deg); }
+        50% { transform: translate(-2px, -2px) rotate(-0.5deg); }
+        75% { transform: translate(2px, -2px) rotate(0.5deg); }
+    }
+
+    /* NEW SLIDESHOW DESIGN */
+    .gallery { 
+        position: relative;
+        top: -85px; 
+        
+        width: 300px;
+        height: 300px;
+        margin-bottom: 25px;
+        
+        border: 7px solid transparent;
+        background: linear-gradient(white, white) padding-box,
+                    linear-gradient(to right, #ff4d6d, #d63351) border-box;
+        
+        box-shadow: 0 0 20px rgba(214, 51, 81, 0.4);
+        border-radius: 20px; 
+        overflow: hidden;
+    }
+
+    .gallery img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1.5s ease-in-out;
+    }
+
+    .gallery img.active-img { opacity: 1; }
+
+    /* --- UPDATED FINAL MESSAGE STYLE --- */
+    .final-msg { 
+        color: white; 
+        font-size: 17px; 
+        max-width: 85vw; 
+        text-align: center; 
+        background: rgba(0,0,0,0.3); 
+        padding: 20px; 
+        border-radius: 20px; 
+        line-height: 1.5;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        
+        /* Ensures it fits screen and scrolls if needed */
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        margin-top: -65px;
+    }
+    
+    /* Scrollbar styling for a cleaner look */
+    .scrollable-text {
+        overflow-y: auto;
+        padding-right: 10px;
+        margin-bottom: 10px;
+        text-align: left; /* Better for long letters */
+    }
+    .scrollable-text::-webkit-scrollbar { width: 5px; }
+    .scrollable-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 5px; }
+    /* ----------------------------------- */
+
+    /* SLOW BURST */
+    .heart-burst { position: absolute; font-size: 28px; pointer-events: none; animation: burst 3s ease-out forwards; z-index: 100; }
+    @keyframes burst {
+        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+        100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3); opacity: 0; }
+    }
+
+    @media (max-width: 800px) {
+        .envelope { height: 220px; }
+        .flap-top { border-left-width: 45vw; border-right-width: 45vw; border-top-width: 130px; }
+        .flap-left { border-left-width: 46vw; border-top-width: 110px; border-bottom-width: 110px; }
+        .flap-right { border-right-width: 46vw; border-top-width: 110px; border-bottom-width: 110px; }
+        .flap-bottom { border-left-width: 45vw; border-right-width: 45vw; border-bottom-width: 120px; }
+        .seal { top: 110px; width: 60px; height: 60px; font-size: 25px; }
+        .envelope.open .letter { transform: translateY(-140px) rotate(-2deg); }
+        .final-msg { max-height: 35vh; font-size: 16px; }
+    }
+
+    .floating-element { position: absolute; bottom: -100px; opacity: 0.7; font-size: 35px; animation: floatUp 10s linear infinite; z-index: 1; }
+    @keyframes floatUp {
+        0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.7; }
+        100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+    }
+</style>
+</head>
+
+<body>
+    <div class="background-container" id="bg"></div>
+
+    <div class="content-wrapper">
+        <div class="screen active" id="screen1">
+            <div class="envelope-wrapper" onclick="openEnvelope(event)">
+                <div class="envelope" id="envelope">
+                    <div class="letter">
+                        Χαρούμενη Ημέρα Αγίου Βαλεντίνου γυναίκα της ζωής μου Μπορώ να σε ρωτήσω κάτι?🥹
+                        <button id="nextBtn" style="margin-top: 10px;">Ναι?🥹</button>
+                    </div>
+                    <div class="flap-top"></div>
+                    <div class="flap-left"></div>
+                    <div class="flap-right"></div>
+                    <div class="flap-bottom"></div>
+                    <div class="seal">💖</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen2">
+            <div class="teddy-box" id="teddyContainer">
+                <div class="bubble" id="teddyBubble">Σε παρακαλώ πες ναι🥺</div>
+                🧸<div id="bearRose" class="rose">🌹</div>
+            </div>
+            <h1>Θα είσαι η Valentina μου?🥹💍💕</h1>
+            <div class="btn-container" style="position: relative; height: 150px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <button id="yesBtn">ΝΑΙ!💍💘</button>
+                <button id="noBtn" style="position: relative;">ΟΧΙ🥺</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen3">
+            <div class="gallery" id="slideshow">
+                <img src="1000025135.jpg" class="active-img">
+                <img src="1000025134.jpg">
+                <img src="1000025136.jpg">
+                <img src="1000025138.jpg">
+				<img src="1000025139.jpg">
+                <img src="1000025140.jpg">
+				<img src="1000025141.jpg">
+				<img src="1000025142.jpg">
+				<img src="1000025143.jpg">
+				<img src="1000025144.jpg">
+				<img src="1000025145.jpg">
+				<img src="1000025146.jpg">
+				<img src="1000025147.jpg">
+				<img src="1000025148.jpg">
+				<img src="1000025149.jpg">
+				
+            </div>
+            <div class="final-msg">
+                <div id="pageContainer" style="transition: opacity 0.5s ease-in-out; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;">
+                    <b style="font-size: 20px;">για την γυναίκα της ζωής μου❤️‍🩹,</b>
+                    <div id="pageText" class="scrollable-text">
+                        Loading your message... ❤️
+                    </div>
+                </div>
+                
+                <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding-top: 10px;">
+                    <button onclick="prevPage()" id="prevBtn" style="padding: 5px 15px; font-size: 12px; background: rgba(255,255,255,0.2); box-shadow: none; visibility: hidden;">Back</button>
+                    <span id="pageIndicator" style="color: white; font-weight: bold;">Page 1 of 5</span>
+                    <button onclick="nextPage()" id="nextBtnMsg" style="padding: 5px 15px; font-size: 12px; background: #d63351; box-shadow: none;">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const envelope = document.getElementById('envelope');
+    const screen1 = document.getElementById('screen1');
+    const screen2 = document.getElementById('screen2');
+    const screen3 = document.getElementById('screen3');
+    const bearRose = document.getElementById('bearRose');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const teddyBubble = document.getElementById('teddyBubble');
+
+    function openEnvelope(e) {
+        if(!envelope.classList.contains('open')){
+            envelope.classList.add('open');
+            const x = e.clientX || window.innerWidth/2;
+            const y = e.clientY || window.innerHeight/2;
+            burstHearts(x, y, ['💖'], 25);
+        }
+    }
+
+    function burstHearts(x, y, particleTypes, count) {
+        for(let i=0; i<count; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('heart-burst');
+            particle.innerText = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            const dx = (Math.random() - 0.5) * 600;
+            const dy = (Math.random() - 0.7) * 600;
+            particle.style.setProperty('--dx', dx + 'px');
+            particle.style.setProperty('--dy', dy + 'px');
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 3000);
+        }
+    }
+
+    function shatterNoButton() {
+        const rect = noBtn.getBoundingClientRect();
+        const pieces = 12; 
+        
+        for (let i = 0; i < pieces; i++) {
+            const piece = document.createElement('div');
+            piece.classList.add('shatter-piece');
+            piece.style.width = Math.random() * 20 + 10 + 'px';
+            piece.style.height = Math.random() * 20 + 10 + 'px';
+            piece.style.clipPath = `polygon(${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%)`;
+            piece.style.left = rect.left + (rect.width / 2) + 'px';
+            piece.style.top = rect.top + (rect.height / 2) + 'px';
+            document.body.appendChild(piece);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 400 + 200;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+            const rot = Math.random() * 720 - 360;
+
+            setTimeout(() => {
+                piece.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg)`;
+                piece.style.opacity = '0';
+            }, 10);
+
+            setTimeout(() => piece.remove(), 1000);
+        }
+        noBtn.style.display = 'none'; 
+    }
+
+    nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const rect = nextBtn.getBoundingClientRect();
+        burstHearts(rect.left + rect.width/2, rect.top + rect.height/2, ['❤️'], 25);
+        setTimeout(() => {
+            screen1.style.opacity = '0';
+            setTimeout(() => {
+                screen1.classList.remove('active');
+                screen2.classList.add('active');
+            }, 1000);
+        }, 500);
+    });
+
+    yesBtn.addEventListener('click', (e) => {
+        const rect = yesBtn.getBoundingClientRect();
+        burstHearts(rect.left + rect.width/2, rect.top + rect.height/2, ['❤️', '💍', '💖', '✨'], 50);
+        
+        shatterNoButton();
+        
+        screen2.classList.add('excited-shake');
+        bearRose.classList.add('rose-appear');
+        teddyBubble.innerText = "YAYYY! ΣΕ ΑΓΑΠΑΩ🥹💍";
+
+        setTimeout(() => {
+            screen2.style.opacity = '0';
+            setTimeout(() => {
+                screen2.classList.remove('active');
+                screen2.classList.remove('excited-shake');
+                screen3.classList.add('active');
+                startSlideshow(); 
+                updatePage(); 
+            }, 1000);
+        }, 3000); 
+    });
+
+    function startSlideshow() {
+        const images = document.querySelectorAll('#slideshow img');
+        let currentIdx = 0;
+        setInterval(() => {
+            images[currentIdx].classList.remove('active-img');
+            currentIdx = (currentIdx + 1) % images.length;
+            images[currentIdx].classList.add('active-img');
+        }, 5000);
+    }
+
+    function moveNo() {
+        const padding = 60;
+        const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+        const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+        const randomX = Math.max(padding, Math.random() * maxX);
+        const randomY = Math.max(padding, Math.random() * maxY);
+        noBtn.style.position = 'fixed';
+        noBtn.style.left = '0';
+        noBtn.style.top = '0';
+        noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+    }
+
+    noBtn.addEventListener('mouseover', moveNo);
+    noBtn.addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        moveNo(); 
+    });
+
+    function createFloatingElement() {
+        const element = document.createElement("div");
+        element.classList.add("floating-element");
+        const types = ['❤️', '🌹', '🎈'];
+        element.innerText = types[Math.floor(Math.random() * types.length)];
+        element.style.left = Math.random() * window.innerWidth + "px";
+        element.style.animationDuration = (Math.random() * 5 + 5) + "s";
+        document.getElementById('bg').appendChild(element);
+        setTimeout(() => element.remove(), 10000);
+    }
+    setInterval(createFloatingElement, 400);
+
+    // --- MESSAGE PAGINATION LOGIC ---
+    const pages = [
+        "Χαρούμενη ημέρα Αγίου Βαλεντίνου Μαράκι μουυυ έχουμε ακόμα φουλ πολλές τέτοιες μέρες μαζί και δεν φαντάζεσαι πόσο το θέλω είσαι η γυναίκα της ζωής μου και κάθε μέρα είμαι ακόμα πιο σίγουρος ότι σε θέλω στη ζωή μου και σε ερωτεύομαι κάθε μέρα όλο και πιο πολύ είσαι πανέμορφη έχεις σωματάρα και είσαι απλά ό τι μα ό τι καλύτερο θέλω να κάνω οικογένεια μαζί σου να είσαι η μαμά των παιδιών μου η γυναίκα που θα ξυπνάω και θα κοιμάμαι και θα ζω μαζί της όσο και να με πληγώνεις εσένα θέλω στη ζωή μου για πάντα ξέρω είμαστε μικροί και τέτοια αλλά αυτό δεν σημαίνει κάτι μπορεί να κάνουμε λάθη αλλά από αυτά μαθαίνουμε απλά θέλω και εσύ να αλλάξεις λίγο να μου δείξεις λίγο παραπάνω ξέρεις με πληγώνει να μου είσαι έτσι δεν φαντάζεσαι πόσο πληγώνομαι να μιλάμε έτσι ο ένας στον άλλον σαν ζώα λες και δεν αγαπηθήκαμε ποτέ αλλά δεν είναι αυτό το κάνουμε από φόβο και πίεση δεν ξέρουμε τι να κάνουμε και δεν θέλουμε να χάσουμε ο ένας τον άλλον αλλά μικρούλα μου έχουμε περάσει τόσα μαζί δύσκολα εύκολα στενάχωρα χαρούμενα και τα έχουμε καταφέρει έχουμε και την απόσταση που είναι πολύ δύσκολο αλλά και πάλι τα καταφέρνουμε ζωή μου εφόσον το θέλουμε και οι δύο απλά θέλω όποτε γίνεται κάτι να καθόμαστε να το συζητάμε κατευθείαν και να μην το παρατάμε και γίνεται χειρότερο και τέτοια και να το κρατάμε τόσο καιρό και τώρα είδες τι έγινε μικρούλα μου γίναμε χάλια από εσένα θέλω να μου είσαι ειλικρινής να μην λες ποτέ μα ποτέ ψέματα να προσπαθήσεις να έρθεις κοντά μου θα προσπαθήσω και εγώ με καλύτερο τρόπο και γενικά να έρθουμε πιο κοντά δεν ξέρεις πόσο άσχημα νιώθω όταν μιλάμε έτσι ή όταν μου μιλάς έτσι νιώθω πως με σφάζουν δεν το αντέχω πόσες φορές έχω κλάψει είναι οι χειρότερες μέρες της ζωής μου δεν μπορώ άλλο έτσι δεν μπορώ να σε έχω μακριά μου και συγγνώμη που φέρθηκα έτσι πολλές φορές απλά μωρό μου ένιωσα ότι μου την μπαίνεις και ότι με προκαλείς και όταν σου λέω πως νιώθω και μου λες οκ ή οκαυ ή εντάξει δεν αντέχω και αυτό το χωρίζουμε δεν το εννοούσα ποτέ δεν πρόκειται να το έλεγα και να το εννοούσα απλά με είχες κάνει να νιώθω άσχημα και θέλω να με ακούς γιατί σε ελέγχω επειδή θέλω να νιώθω ότι με σέβεσαι και όταν κάνεις αυτά στον άλλον ψυχούλα μου και δεν τον ακούς και ότι κάνεις πόλεμο λογικό είναι να κάνει μπουμ δεν γίνεται να πας σε κάποιον και να τον βρίζεις μπροστά στη μούρη του και να σου πει ευχαριστώ αλλά το μισό να σου είμαι έτσι στα έχω εξηγήσει και θέλω να ξέρω αν σ αρέσω ακόμα όπως παλιά να νιώθεις ακόμα όπως παλιά μου λείπεις θέλω να έρθεις κοντά μου σε παρακαλώ και να γυρίσει το Μαράκι που γνώρισα το κοριτσάκι που αγάπησα είσαι διαφορετική είσαι τέλεια μην αλλάζεις σε παρακαλώ σου έστειλα και το βίντεο να καταλάβεις τι εννοώ δεν είναι ωραίο να αλλάζεις αυτό που είσαι σε αγαπάω έτσι όπως είσαι γι αυτό σε αγάπησα είσαι τέλεια και διαφορετική και μοναδική σε θέλω για πάντα στη ζωή μου και σε αγαπάω όσο κανέναν άλλον μου λείπει να το κάνουμε να παίζουμε τα κομπλιμέντα τις βλακείες τα αστεία το κουτσομπολιό μας όλα τα θέλω πίσω και θέλω να κάτσουμε να τα συζητήσουμε κάποια μέρα γλυκά και ήρεμα και να απαντάς και θα δεις πόσο πιο όμορφα και εύκολα θα γίνονται όλα απλά άκουσέ με και θα δεις γυναίκα της ζωής μου σε λατρεύω ελπίζω να σου αρέσει αυτό που έφτιαξα δεν είναι και το καλύτερο κάτι απλό είναι απλά μου άρεσε σαν ιδέα και το έκανα είσαι τέλεια απλά σε παρακαλώ αυτό ναι σε αγαπάω γυναίκα της ζωής μου❤️‍🩹",
+        "ΣΕ ΑΓΑΠΑΩ ΠΑΡΑ ΜΑ ΠΑΡΑ ΠΟΛΥΥ🥹🥹 δεν ξέρεις πόσο χρειάζομαι την αγκαλίτσα σου μου λείπεις θέλω να τα φτιάξουμε όλααα και να γίνουμε καλά και καλύτερα από πρινν❤️‍🩹",
+    ];
+
+    let currentPage = 0;
+
+    function updatePage() {
+        const pageText = document.getElementById('pageText');
+        const pageIndicator = document.getElementById('pageIndicator');
+        const pageContainer = document.getElementById('pageContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtnMsg = document.getElementById('nextBtnMsg');
+
+        pageContainer.style.opacity = 0;
+
+        setTimeout(() => {
+            pageText.innerHTML = pages[currentPage];
+            pageIndicator.innerText = `Page ${currentPage + 1} of ${pages.length}`;
+            prevBtn.style.visibility = currentPage === 0 ? "hidden" : "visible";
+            nextBtnMsg.innerText = currentPage === pages.length - 1 ? "End ❤️" : "Next";
+            pageContainer.style.opacity = 1;
+            // Scroll back to top when page changes
+            pageText.scrollTop = 0;
+        }, 500);
+    }
+
+    function nextPage() {
+        if (currentPage < pages.length - 1) {
+            currentPage++;
+            updatePage();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            updatePage();
+        }
+    }
+</script>
+</body>
+</html>
